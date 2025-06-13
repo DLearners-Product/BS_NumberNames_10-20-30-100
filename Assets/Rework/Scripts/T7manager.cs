@@ -80,20 +80,22 @@ public class T7manager : MonoBehaviour
                 DoCorrectMatchEffect(selectedQuestion, selectedAnswer);
 
                 int currentCounterValue = int.Parse(counter.text);
-                if (currentCounterValue < 9)
+                if (currentCounterValue < 8)
                 {
                     currentCounterValue++;
                     counter.text = currentCounterValue.ToString();
                 }
-                if (currentCounterValue > 4)
+                if (currentCounterValue > 3)
                 {
                     doTweenManager.ChangeLocalYPosition();
                 }
 
-                if (currentCounterValue == 9)
+                if (currentCounterValue == 8)
                 {
                     Debug.Log("Game Over");
-                    activityCompleted.SetActive(true);
+                    StartCoroutine(smallDelay());
+                    
+
                 }
 
                 // Disable interaction
@@ -110,6 +112,12 @@ public class T7manager : MonoBehaviour
 
             // Reset selections
             ResetSelections();
+        }
+
+        IEnumerator smallDelay()
+        {
+            yield return new WaitForSeconds(1f);
+            activityCompleted.SetActive(true);
         }
     }
 

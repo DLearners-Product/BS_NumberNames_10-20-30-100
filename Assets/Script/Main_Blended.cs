@@ -38,7 +38,7 @@ public class Main_Blended : MonoBehaviour
 
 
     public VideoPlayer Videoplayerinlevel;
-    bool B_pause;
+   public bool B_pause;
 
 
 
@@ -137,7 +137,7 @@ public class Main_Blended : MonoBehaviour
        /////////////////////////////////////////////////////////// STR_date_with_time = System.DateTime.Now.ToString("dd-MM-yy HH:mm");
 
         i_vol = 0;
-        B_pause = false;
+        B_pause = true;
         levelno = 0;
         THI_cloneLevels();
 
@@ -147,7 +147,7 @@ public class Main_Blended : MonoBehaviour
     {
         LS_WORDS = new List<string>();
        
-        G_worksheet.transform.GetChild(0).gameObject.SetActive(false);
+        
         G_Pointer.SetActive(false);
         G_write.SetActive(false);
         IF_typing.gameObject.SetActive(false);
@@ -398,7 +398,7 @@ public class Main_Blended : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("passage", STR_Passage);
 
-       // Debug.Log("Sending :" + STR_Passage);
+        Debug.Log("Sending :" + STR_Passage);
 
         UnityWebRequest www = UnityWebRequest.Post(STR_API, form);
         yield return www.SendWebRequest();
@@ -433,6 +433,7 @@ public class Main_Blended : MonoBehaviour
                     }
                 }
             }
+
         }
     }
 
@@ -660,27 +661,11 @@ public class Main_Blended : MonoBehaviour
             G_Zoomrect.GetComponent<ScrollRect>().content = BG.gameObject.GetComponent<RectTransform>();
         }
     }
-    public void BUT_backWorksheet()
-    {
-        if (I_worksheetindex > 0)
-        {
-            I_worksheetindex--;
-            G_Sprite.GetComponent<Image>().sprite = SPR_worksheet[I_worksheetindex];
-        }
 
-    }
-    public void BUT_nextWorksheet()
-    {
-        if (I_worksheetindex < SPR_worksheet.Length - 1)
-        {
-            I_worksheetindex++;
-            G_Sprite.GetComponent<Image>().sprite = SPR_worksheet[I_worksheetindex];
-        }
-    }
     public void BUT_Worksheeton()
     {
         index = levelno;
-        if (index == 8) { I_worksheetindex = 0; }
+        if (index == 7) { I_worksheetindex = 0; }
        // if (index == 9) { I_worksheetindex = 1; }
         I_dummy++;
         if (I_dummy % 2 != 0)
@@ -701,10 +686,6 @@ public class Main_Blended : MonoBehaviour
         I_drawcount++;
         if (I_drawcount % 2 != 0)
         {
-            if(G_currenlevel.GetComponent<Draw>()!=null)
-            {
-                G_currenlevel.GetComponent<Draw>().enabled = false;
-            }
             G_write.SetActive(true);
             Draw.OBJ_draw.brush.GetComponent<LineRenderer>().SetColors(Color.black, Color.black);
             Draw.OBJ_draw.brush.GetComponent<LineRenderer>().SetWidth(0.05f, 0.05f);
@@ -722,10 +703,6 @@ public class Main_Blended : MonoBehaviour
         }
         else
         {
-            if (G_currenlevel.GetComponent<Draw>() != null)
-            {
-                G_currenlevel.GetComponent<Draw>().enabled = true;
-            }
             G_write.SetActive(false);
             G_Pointer.SetActive(false);
             I_drawcount = 0;
@@ -780,10 +757,6 @@ public class Main_Blended : MonoBehaviour
     }
     public void BUT_Board()
     {
-        if (G_currenlevel.GetComponent<Draw>() != null)
-        {
-            G_currenlevel.GetComponent<Draw>().enabled = false;
-        }
         for (int i = 0; i < G_write.transform.childCount; i++)
         {
             G_write.transform.GetChild(i).gameObject.SetActive(true);
@@ -799,10 +772,6 @@ public class Main_Blended : MonoBehaviour
         }
         else
         {
-            if (G_currenlevel.GetComponent<Draw>() != null)
-            {
-                G_currenlevel.GetComponent<Draw>().enabled = true;
-            }
             G_write.SetActive(false);
             G_Pointer.SetActive(false);
             IF_typing.gameObject.SetActive(false);
@@ -814,15 +783,17 @@ public class Main_Blended : MonoBehaviour
 
     public void THI_cloneLevels()
     {
-        B_pause = false;
-        ImmersiveObjects = new GameObject[0];
-        G_worksheet.transform.GetChild(0).gameObject.SetActive(false);
+        // ImmersiveObjects = new GameObject[0];
+        // B_pause = false;
+        // G_worksheet.transform.GetChild(0).gameObject.SetActive(false);
         //  Debug.Log("zzzzzzz111111==="+ImmersiveObjects.Length);
+        B_pause = true;
         if (G_currenlevel != null)
         {
             Destroy(G_currenlevel);
         }
-        var currentLevel = Instantiate(GA_levelsIG[levelno]);
+      // var currentLevel = Instantiate(GA_levelsIG[levelno]);
+       var currentLevel = Instantiate(MainBlendedData.instance.slideDatas[levelno].slideObject);
         currentLevel.transform.SetParent(GameObject.Find("Game_Panel").transform, false);
         currentLevel.transform.SetAsFirstSibling();
         G_currenlevel = currentLevel;
@@ -832,6 +803,8 @@ public class Main_Blended : MonoBehaviour
         {
             BG = currentLevel.GetComponent<Image>();
         }
+
+
 
         ImmersiveObjects = GameObject.FindGameObjectsWithTag("Immersive");
         // Debug.Log("zzzzzzz4444 :" + ImmersiveObjects.Length);
@@ -867,6 +840,8 @@ public class Main_Blended : MonoBehaviour
                             STR_Passage += ImmersiveObjects[k].GetComponent<TextMeshProUGUI>().text;
                         }
 
+
+
                     }
                     if (ImmersiveObjects[k].GetComponent<Text>() != null)
                     {
@@ -889,24 +864,27 @@ public class Main_Blended : MonoBehaviour
 
     public void THI_videoSlidesPausePlay()
     {
-        Videoplayerinlevel = GameObject.Find("Video Player").GetComponent<VideoPlayer>();
-        if (B_pause)
+        for (int i = 0; i < HAS_VIDEO.Length; i++)
         {
-            if (Videoplayerinlevel != null)
+            if(HAS_VIDEO[i] == true)
             {
-                // Debug.Log("Play video");
-                Videoplayerinlevel.Play();
-                B_pause = false;
-            }
-        }
-        else
-        {
-            // Debug.Log("Pause Bool false");
-            if (Videoplayerinlevel != null)
-            {
-                //   Debug.Log("Pause Video");
-                Videoplayerinlevel.Pause();
-                B_pause = true;
+                Videoplayerinlevel = GameObject.Find("Video Player").GetComponent<VideoPlayer>();
+                if (!B_pause)
+                {
+                    if (Videoplayerinlevel != null)
+                    {
+                        Videoplayerinlevel.Pause();
+                        B_pause = true;
+                    }
+                }
+                else
+                {
+                    if (Videoplayerinlevel != null)
+                    {
+                        Videoplayerinlevel.Play();
+                        B_pause = false;
+                    }
+                }
             }
         }
     }
@@ -919,7 +897,7 @@ public class Main_Blended : MonoBehaviour
 
     public void levelselect(int level)
     {
-        B_pause = false;
+      //  B_pause = false;
         levelno = level;
       //  THI_videoSlidesMute();
         THI_cloneLevels();
